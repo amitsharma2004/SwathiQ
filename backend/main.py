@@ -31,19 +31,21 @@ app.include_router(inventory.router, prefix="/api/inventory", tags=["Inventory"]
 @app.on_event("startup")
 def startup_event():
     """Create tables and seed data if database is empty"""
-    # Create all tables
-    Base.metadata.create_all(bind=engine)
-    
-    # Check if database is empty and seed if needed
-    db = SessionLocal()
     try:
-        medicine_count = db.query(Medicine).count()
-        if medicine_count == 0:
-            print("📦 Seeding database with initial data...")
-            seed_initial_data(db)
-            print("✅ Database seeded successfully!")
-    finally:
-        db.close()
+        Base.metadata.create_all(bind=engine)
+        
+        db = SessionLocal()
+        try:
+            medicine_count = db.query(Medicine).count()
+            if medicine_count == 0:
+                print("📦 Seeding database with initial data...")
+                seed_initial_data(db)
+                print("✅ Database seeded successfully!")
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"⚠️ Database startup warning: {str(e)}")
+        print("App will continue but database may not be available")
 
 def seed_initial_data(db):
     """Seed initial data into database"""
