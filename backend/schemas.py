@@ -35,7 +35,7 @@ class MedicineResponse(MedicineBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Sale Item Schemas
 class SaleItemBase(BaseModel):
@@ -51,7 +51,7 @@ class SaleItemResponse(SaleItemBase):
     sale_id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Sale Schemas
 class SaleBase(BaseModel):
@@ -70,7 +70,7 @@ class SaleResponse(SaleBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Dashboard Schemas
 class DashboardSummaryResponse(BaseModel):
