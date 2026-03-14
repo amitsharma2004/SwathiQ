@@ -1,6 +1,5 @@
 from datetime import datetime, date, timedelta
-from database import SessionLocal, engine, Base
-from models import Medicine, Sale, SaleItem
+from database import SessionLocal, engine, Basefrom models import Medicine, Sale, SaleItem
 
 def seed_database():
     Base.metadata.create_all(bind=engine)

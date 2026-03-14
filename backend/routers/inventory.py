@@ -28,14 +28,13 @@ def calculate_medicine_status(medicine: Medicine) -> str:
 @router.get("/medicines", response_model=List[MedicineResponse])
 def get_medicines(
     search: Optional[str] = Query(None, description="Search by name or generic name"),
-    status: Optional[str] = Query(None, description="Filter by status"),
+    status_filter: Optional[str] = Query(None, alias="status", description="Filter by status"),
     category: Optional[str] = Query(None, description="Filter by category"),
     db: Session = Depends(get_db)
 ):
     try:
         query = db.query(Medicine)
         
-        # Apply search filter
         if search:
             query = query.filter(
                 or_(
@@ -44,11 +43,9 @@ def get_medicines(
                 )
             )
         
-        # Apply status filter
-        if status:
-            query = query.filter(Medicine.status == status)
+        if status_filter:
+            query = query.filter(Medicine.status == status_filter)
         
-        # Apply category filter
         if category:
             query = query.filter(Medicine.category == category)
         
@@ -57,7 +54,7 @@ def get_medicines(
         
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=500,
             detail=f"Error fetching medicines: {str(e)}"
         )
 
@@ -95,7 +92,7 @@ def get_inventory_overview(db: Session = Depends(get_db)):
 def create_medicine(medicine_data: MedicineCreate, db: Session = Depends(get_db)):
     try:
         # Create medicine instance
-        new_medicine = Medicine(**medicine_data.dict())
+        new_medicine = Medicine(**medicine_data.model_dump())
         
         # Auto-calculate status
         new_medicine.status = calculate_medicine_status(new_medicine)
@@ -129,7 +126,7 @@ def update_medicine(
             )
         
         # Update fields
-        update_data = medicine_data.dict(exclude_unset=True)
+        update_data = medicine_data.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(medicine, field, value)
         
